@@ -50,8 +50,7 @@
     color: var(--text);
     font-family: 'Poppins', sans-serif;
     overflow-x: hidden;
-    cursor: pointer; /* shows it’s clickable */
-}
+  }
   
 
   /* ─── FLOATING HEARTS ─────────────────────────────── */
@@ -70,6 +69,66 @@
     z-index: 1;
   }
   .section.active { opacity: 1; pointer-events: all; }
+
+  /* ─── PLAY BUTTON OVERLAY ────────────────────────── */
+  #play-overlay {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 30% 50%, #0d1a0d 0%, #0a0a0a 70%);
+    z-index: 100;
+    transition: opacity 0.8s ease;
+  }
+  #play-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .play-container {
+    text-align: center;
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  .play-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    color: var(--accent2);
+    margin-bottom: 2rem;
+    font-style: italic;
+    text-shadow: 0 0 40px rgba(255,77,109,0.5);
+  }
+  .play-btn {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff4d6d, #c9184a);
+    border: 3px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 60px rgba(255,77,109,0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 80px rgba(255,77,109,0.6);
+  }
+  .play-btn svg {
+    width: 50px;
+    height: 50px;
+    fill: white;
+    margin-left: 6px;
+  }
+  .play-hint {
+    margin-top: 1.5rem;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(255,77,109,0.3)); }
+    50% { filter: drop-shadow(0 0 40px rgba(255,77,109,0.6)); }
+  }
 
   /* ─── STAGE 1 – TERMINAL ──────────────────────────── */
   #stage-terminal {
@@ -467,6 +526,19 @@
 <canvas id="hearts-canvas"></canvas>
 <canvas id="confetti-canvas"></canvas>
 
+<!-- Play Button Overlay -->
+<div id="play-overlay">
+  <div class="play-container">
+    <div class="play-title">For Mildred ❤️</div>
+    <div class="play-btn" id="play-btn">
+      <svg viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </div>
+    <div class="play-hint">Click to begin ✦</div>
+  </div>
+</div>
+
 <!-- Stage dots -->
 <div class="stage-dots" id="stage-dots">
   <div class="stage-dot active" id="dot-0"></div>
@@ -476,7 +548,7 @@
 </div>
 
 <!-- ─── STAGE 1: TERMINAL ─────────────────────────── -->
-<div class="section active" id="stage-terminal">
+<div class="section" id="stage-terminal">
   <div class="terminal-wrap">
     <div class="terminal-bar">
       <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
@@ -671,25 +743,10 @@
 })();
 
 /* ─── IMAGE LOADER: replace with actual image URLs ─── */
-// IMPORTANT: Replace these placeholder URLs with actual images of Mildred
-// The images will automatically show once you replace the URLs below.
-// For now, graceful fallback SVG hearts are shown.
-
-// To add real images, replace the src with your image URLs:
-// Example: document.getElementById('mildred-photo-1').src = 'your-image-1.jpg';
-
-// For demonstration, we'll keep the placeholder system but show an elegant note.
-// You can simply uncomment and replace the lines below with actual image paths.
-
-
 document.getElementById('mildred-photo-1').src = 'mil.jpeg';
 document.getElementById('mildred-photo-2a').src = 'mill.jpeg';
 document.getElementById('mildred-photo-2b').src = 'millll.jpeg';
 document.getElementById('mildred-photo-3').src = 'dred.jpeg';
-
-
-// The current placeholder images show elegant SVG hearts with "Mildred" text.
-// Just replace the src attributes above with your actual image URLs.
 
 /* ══════════════════════════════════════════════════
    STAGE 1 – TERMINAL TYPER + AUTO ADVANCE
@@ -711,8 +768,12 @@ const lines = [
 ];
 
 const output = document.getElementById('terminal-output');
+let terminalStarted = false;
 
-function typeLinesAndAutoAdvance() {
+function startTerminalTyping() {
+  if (terminalStarted) return;
+  terminalStarted = true;
+  
   lines.forEach((line, i) => {
     setTimeout(() => {
       const cursor = output.querySelector('.cursor');
@@ -732,7 +793,39 @@ function typeLinesAndAutoAdvance() {
     }, line.delay);
   });
 }
-typeLinesAndAutoAdvance();
+
+/* ══════════════════════════════════════════════════
+   PLAY BUTTON + AUDIO
+══════════════════════════════════════════════════ */
+const audio = document.getElementById('bg-audio');
+audio.volume = 0.25;
+const playOverlay = document.getElementById('play-overlay');
+const playBtn = document.getElementById('play-btn');
+const terminalSection = document.getElementById('stage-terminal');
+
+playBtn.addEventListener('click', async () => {
+  try {
+    await audio.play();
+    
+    // Hide overlay with fade
+    playOverlay.classList.add('hidden');
+    
+    // Show terminal and start typing
+    setTimeout(() => {
+      terminalSection.classList.add('active');
+      startTerminalTyping();
+    }, 400);
+    
+  } catch (err) {
+    console.log('Audio play failed:', err);
+    // Still proceed even if audio fails
+    playOverlay.classList.add('hidden');
+    setTimeout(() => {
+      terminalSection.classList.add('active');
+      startTerminalTyping();
+    }, 400);
+  }
+});
 
 /* ══════════════════════════════════════════════════
    STARS FOR SCENE 3
@@ -909,20 +1002,6 @@ function launchBigHearts() {
 const styleEl = document.createElement('style');
 styleEl.textContent = `@keyframes riseHeart { from{transform:translateY(0) scale(0.6);opacity:1} to{transform:translateY(-110vh) scale(1.2);opacity:0} }`;
 document.head.appendChild(styleEl);
-
-const audio = document.getElementById('bg-audio');
-audio.volume = 0.25;
-
-const startAudio = () => {
-  audio.play().catch(err => console.log('Audio play failed:', err));
-};
-
-// One-time click/tap on body
-document.body.addEventListener('click', startAudio, { once: true });
-document.body.addEventListener('touchstart', startAudio, { once: true });
-
-// Optional: visual cue
-document.body.style.cursor = 'pointer';
 
 </script>
 </body>

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Page Title -->
+  <title>For Mildred ❤️ – A Special Surprise Just for You</title>
+
+  <!-- Meta Description -->
+  <meta name="description" content="A heartfelt interactive surprise for Mildred. Explore the story, enjoy the visuals, and discover the question waiting for you." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="mil.jpeg" />
+
+  <!-- Open Graph / Social Media Preview -->
+  <meta property="og:title" content="For Mildred ❤️ – A Special Surprise Just for You" />
+  <meta property="og:description" content="A heartfelt interactive surprise for Mildred. Explore the story, enjoy the visuals, and discover the question waiting for you." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mildred-ivory.vercel.app/" />
+  <meta property="og:image" content="https://mildred-ivory.vercel.app/mil.jpeg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:alt" content="Mildred's special photo" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="For Mildred ❤️ – A Special Surprise Just for You" />
+  <meta name="twitter:description" content="A heartfelt interactive surprise for Mildred. Explore the story, enjoy the visuals, and discover the question waiting for you." />
+  <meta name="twitter:image" content="https://mildred-ivory.vercel.app/mil.jpeg" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --text: #ffffff;
+    --accent: #ff4d6d;
+    --accent2: #ffd6dc;
+    --terminal-green: #00ff88;
+    --card-bg: rgba(255,255,255,0.04);
+    --card-border: rgba(255,77,109,0.25);
+  }
+
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+    cursor: pointer; /* shows it’s clickable */
+}
+  
+
+  /* ─── FLOATING HEARTS ─────────────────────────────── */
+  #hearts-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── SECTIONS ────────────────────────────────────── */
+  .section {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.9s ease;
+    z-index: 1;
+  }
+  .section.active { opacity: 1; pointer-events: all; }
+
+  /* ─── STAGE 1 – TERMINAL ──────────────────────────── */
+  #stage-terminal {
+    background: radial-gradient(ellipse at 30% 50%, #0d1a0d 0%, #0a0a0a 70%);
+  }
+  .terminal-wrap {
+    width: min(720px, 95vw);
+    background: rgba(0,20,0,0.85);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 12px;
+    padding: 2rem 2.2rem 1.8rem;
+    box-shadow: 0 0 60px rgba(0,255,136,0.07), 0 0 120px rgba(0,255,136,0.04);
+    backdrop-filter: blur(8px);
+  }
+  .terminal-bar {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 1.4rem;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+  .terminal-title {
+    margin-left: auto; margin-right: auto;
+    font-size: 0.7rem; letter-spacing: 0.12em;
+    color: rgba(0,255,136,0.4); text-transform: uppercase;
+  }
+  #terminal-output {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(0.78rem, 2vw, 0.92rem);
+    color: var(--terminal-green);
+    line-height: 1.9;
+    min-height: 220px;
+  }
+  #terminal-output .line { display: block; }
+  #terminal-output .line.dim { color: rgba(0,255,136,0.45); }
+  #terminal-output .line.highlight { color: #ffffff; font-weight: 500; }
+  #terminal-output .line.warn { color: #ffd166; }
+  #terminal-output .cursor {
+    display: inline-block; width: 9px; height: 1.1em;
+    background: var(--terminal-green);
+    animation: blink 0.9s infinite;
+    vertical-align: text-bottom; margin-left: 2px;
+  }
+  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+  /* ─── STAGE 2 – STORY ─────────────────────────────── */
+  #stage-story { background: var(--bg); }
+  .scene {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1s ease;
+  }
+  .scene.visible { opacity: 1; pointer-events: all; }
+  .scene-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    filter: brightness(0.28) saturate(0.7);
+  }
+  .scene-1-bg { background: radial-gradient(ellipse at 40% 60%, #1a0a12 0%, #0a0a0a 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ccircle cx='200' cy='200' r='180' fill='%23330011' opacity='.3'/%3E%3C/svg%3E"); }
+  .scene-2-bg { background: radial-gradient(ellipse at 60% 40%, #1a0e00 0%, #0a0a0a 100%); }
+  .scene-3-bg { background: radial-gradient(ellipse at 50% 30%, #060a1a 0%, #0a0a0a 100%); }
+
+  /* Decorative overlays */
+  .scene-1-bg::after { content:''; position:absolute;inset:0;
+    background: radial-gradient(ellipse at 30% 70%, rgba(255,77,109,0.12) 0%, transparent 60%); }
+  .scene-2-bg::after { content:''; position:absolute;inset:0;
+    background: radial-gradient(ellipse at 70% 30%, rgba(255,180,50,0.10) 0%, transparent 60%); }
+  .scene-3-bg::after { content:''; position:absolute;inset:0;
+    background: radial-gradient(ellipse at 50% 20%, rgba(80,100,200,0.12) 0%, transparent 60%); }
+
+  .scene-content {
+    position: relative; z-index: 2;
+    text-align: center;
+    padding: 2rem;
+    max-width: min(600px, 92vw);
+  }
+  
+  /* Photo frame styling - elegant polaroid style */
+  .photo-frame {
+    margin: 1.5rem auto 1.8rem;
+    width: min(220px, 70vw);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+    padding: 12px 12px 16px 12px;
+    border: 1px solid rgba(255,77,109,0.3);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+  }
+  .photo-frame:hover {
+    transform: scale(1.02);
+    border-color: rgba(255,77,109,0.7);
+  }
+  .photo-frame img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+    background: #1a0a12;
+  }
+  .photo-caption {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--accent2);
+    opacity: 0.7;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  /* Two photos side by side in scene 2 */
+  .photo-duo {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.2rem auto 1.5rem;
+  }
+  .photo-duo .photo-frame {
+    margin: 0;
+    width: min(160px, 40vw);
+  }
+  
+  .scene-number {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem; letter-spacing: 0.2em;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 1rem; opacity: 0.8;
+  }
+  .scene-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 4vw, 2.2rem);
+    font-style: italic; line-height: 1.4;
+    color: var(--text);
+    text-shadow: 0 2px 40px rgba(255,77,109,0.3);
+    margin-bottom: 0.8rem;
+  }
+  .scene-line {
+    width: 40px; height: 1px;
+    background: var(--accent);
+    margin: 1.5rem auto 1.5rem;
+    opacity: 0.6;
+  }
+  .story-btn {
+    background: transparent;
+    border: 1px solid rgba(255,77,109,0.5);
+    color: var(--accent2);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.82rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.75rem 2.2rem;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.35s;
+    position: relative; overflow: hidden;
+  }
+  .story-btn::before {
+    content:''; position:absolute; inset:0;
+    background: rgba(255,77,109,0.12);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.35s;
+  }
+  .story-btn:hover::before { transform: scaleX(1); }
+  .story-btn:hover { border-color: var(--accent); box-shadow: 0 0 25px rgba(255,77,109,0.25); color: #fff; }
+
+  /* Decorative stars for scene 3 */
+  .stars {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .star {
+    position: absolute; background: #fff;
+    border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease-in-out infinite;
+    animation-delay: var(--dl, 0s);
+  }
+  @keyframes twinkle { 0%,100%{opacity:.2} 50%{opacity:1} }
+
+  /* ─── STAGE 3 – CARDS ─────────────────────────────── */
+  #stage-cards {
+    background: radial-gradient(ellipse at 50% 0%, #1a0008 0%, #0a0a0a 60%);
+  }
+  .cards-wrap {
+    text-align: center;
+    padding: 2rem 1rem;
+    width: min(900px, 96vw);
+  }
+  .cards-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    color: var(--accent2); opacity: 0.7;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase; font-style: italic;
+  }
+  .cards-subheading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    color: var(--text);
+    margin-bottom: 3rem;
+    line-height: 1.3;
+  }
+  .cards-row {
+    display: flex; flex-wrap: wrap; gap: 1.4rem;
+    justify-content: center; margin-bottom: 3rem;
+  }
+  .card {
+    width: min(240px, 80vw);
+    height: 220px;
+    perspective: 800px;
+    cursor: pointer;
+  }
+  .card-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(.4,0,.2,1);
+  }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+  .card-front, .card-back {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 1.5rem;
+    border: 1px solid var(--card-border);
+  }
+  .card-front {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .card:hover .card-front {
+    border-color: rgba(255,77,109,0.6);
+    box-shadow: 0 0 30px rgba(255,77,109,0.15);
+  }
+  .card-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+  .card-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; color: var(--accent2);
+    letter-spacing: 0.05em;
+  }
+  .lock-icon { font-size: 1rem; color: rgba(255,214,220,0.3); margin-top: 0.6rem; }
+  .card-back {
+    background: linear-gradient(135deg, #1a0008 0%, #0f0005 100%);
+    border-color: rgba(255,77,109,0.4);
+    transform: rotateY(180deg);
+    box-shadow: 0 0 40px rgba(255,77,109,0.12);
+  }
+  .card-back p {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem; font-style: italic;
+    color: var(--accent2); line-height: 1.6;
+    text-align: center;
+  }
+  .card-back .card-back-icon { font-size: 1.5rem; margin-bottom: 0.8rem; }
+
+  /* Hint pulse ring */
+  .card-front::after {
+    content: ''; position: absolute; inset: -1px;
+    border-radius: 17px; border: 1px solid transparent;
+    animation: pulse-border 2.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes pulse-border {
+    0%,100%{border-color: transparent;}
+    50%{border-color: rgba(255,77,109,0.3);}
+  }
+
+  /* ─── FINAL QUESTION ──────────────────────────────── */
+#stage-question {
+  background: radial-gradient(ellipse at 50% 50%, #1a0008 0%, #0a0a0a 70%);
+  flex-direction: column;
+  gap: 0;
+}
+  .question-wrap { text-align: center; padding: 2rem 1rem; max-width: min(700px, 94vw); }
+  .question-eyebrow {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); opacity: 0.6; margin-bottom: 1.8rem;
+  }
+  .question-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    font-style: italic; color: var(--accent2);
+    opacity: 0.75; margin-bottom: 0.5rem;
+  }
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6.5vw, 4rem);
+    line-height: 1.2; color: var(--text);
+    margin-bottom: 1.2rem;
+    text-shadow: 0 0 60px rgba(255,77,109,0.35);
+  }
+  .question-text span { color: var(--accent); }
+  .question-divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 0 auto 2.6rem;
+  }
+  .answer-btns { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #ff4d6d, #c9184a);
+    border: none; color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem; font-weight: 500;
+    padding: 0.9rem 2.8rem; border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(255,77,109,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .btn-yes:hover { transform: scale(1.06); box-shadow: 0 0 50px rgba(255,77,109,0.6); }
+  .btn-yes:active { transform: scale(0.97); }
+
+  .btn-no {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.4);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.9rem 2.2rem; border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.25s ease, opacity 0.25s;
+    letter-spacing: 0.03em;
+    position: relative;
+  }
+
+  /* YES response */
+  #yes-response {
+    display: none; text-align: center;
+    animation: fadeInUp 0.8s ease forwards;
+  }
+  #yes-response.visible { display: block; }
+  .yes-emoji { font-size: 3rem; margin-bottom: 1rem; }
+  .yes-message {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 3.5vw, 1.9rem);
+    font-style: italic; color: var(--accent2);
+    line-height: 1.5;
+  }
+  .yes-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem; color: rgba(255,214,220,0.5);
+    margin-top: 1rem; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity:0; transform: translateY(20px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ─── CONFETTI ────────────────────────────────────── */
+  #confetti-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 999;
+  }
+
+  /* ─── SCROLL PROGRESS / STAGE INDICATOR ──────────── */
+  .stage-dots {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px; z-index: 10;
+    opacity: 0.6;
+  }
+  .stage-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: background 0.4s, transform 0.4s;
+  }
+  .stage-dot.active { background: var(--accent); transform: scale(1.4); }
+
+  /* ─── MISC ────────────────────────────────────────── */
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .fade-in-item { animation: fadeIn 0.7s ease forwards; opacity:0; }
+  
+  /* Placeholder image style - replace with actual images */
+  .photo-placeholder {
+    background: linear-gradient(135deg, #2a0a1a, #1a0a12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,77,109,0.5);
+    font-size: 2rem;
+  }
+</style>
+</head>
+<body>
+<audio id="bg-audio" src="audio.mp3" preload="auto"></audio>
+<canvas id="hearts-canvas"></canvas>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Stage dots -->
+<div class="stage-dots" id="stage-dots">
+  <div class="stage-dot active" id="dot-0"></div>
+  <div class="stage-dot" id="dot-1"></div>
+  <div class="stage-dot" id="dot-2"></div>
+  <div class="stage-dot" id="dot-3"></div>
+</div>
+
+<!-- ─── STAGE 1: TERMINAL ─────────────────────────── -->
+<div class="section active" id="stage-terminal">
+    <button id="play-audio-btn" class="story-btn">▶ Play for Mildred</button>
+  <div class="terminal-wrap">
+    <div class="terminal-bar">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      <div class="terminal-title">question.exe — bash — 80×24</div>
+    </div>
+    <div id="terminal-output"><span class="cursor"></span></div>
+    <button id="enter-btn" style="display:none;"></button>
+  </div>
+</div>
+
+<!-- ─── STAGE 2: STORY with PHOTOS ────────────────────────────── -->
+<div class="section" id="stage-story">
+  <!-- Scene 1: First photo - elegant single frame -->
+  <div class="scene visible" id="scene-1">
+    <div class="scene-bg scene-1-bg"></div>
+    <div class="scene-content">
+      <div class="scene-number">Chapter 01</div>
+      <div class="scene-text">"It started with simple conversations..."</div>
+      <!-- Photo 1: Memory -->
+      <div class="photo-frame">
+        <img id="mildred-photo-1" alt="Mildred's smile" style="background: #2a1a22;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%232a1a22\'/%3E%3Ctext x=\'100\' y=\'110\' text-anchor=\'middle\' fill=\'%23ff4d6d\' font-size=\'14\'%3E❤️ Mildred%3C/text%3E%3C/svg%3E'">
+        <div class="photo-caption">✨ the warmth of your presence</div>
+      </div>
+      <div class="scene-line"></div>
+      <button class="story-btn" onclick="nextScene(1)">Next →</button>
+    </div>
+  </div>
+  
+  <!-- Scene 2: Two photos side by side -->
+  <div class="scene" id="scene-2">
+    <div class="scene-bg scene-2-bg"></div>
+    <div class="scene-content">
+      <div class="scene-number">Chapter 02</div>
+      <div class="scene-text">"Then I realized talking to you made ordinary days better."</div>
+      <div class="photo-duo">
+        <div class="photo-frame">
+          <img id="mildred-photo-2a" alt="Mildred radiant" style="background: #2a1020;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%232a1020\'/%3E%3Ctext x=\'100\' y=\'110\' text-anchor=\'middle\' fill=\'%23ff4d6d\' font-size=\'14\'%3E🌸 you%3C/text%3E%3C/svg%3E'">
+          <div class="photo-caption">every conversation</div>
+        </div>
+        <div class="photo-frame">
+          <img id="mildred-photo-2b" alt="Mildred happy" style="background: #1a1028;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%231a1028\'/%3E%3Ctext x=\'100\' y=\'110\' text-anchor=\'middle\' fill=\'%23ff4d6d\' font-size=\'14\'%3E⭐️ matters%3C/text%3E%3C/svg%3E'">
+          <div class="photo-caption">mattered more</div>
+        </div>
+      </div>
+      <div class="scene-line"></div>
+      <button class="story-btn" onclick="nextScene(2)">Next →</button>
+    </div>
+  </div>
+  
+  <!-- Scene 3: One final photo before reveal -->
+  <div class="scene" id="scene-3">
+    <div class="scene-bg scene-3-bg"></div>
+    <div class="stars" id="stars"></div>
+    <div class="scene-content">
+      <div class="scene-number">Chapter 03</div>
+      <div class="scene-text">"And somewhere along the way, you became someone special to me."</div>
+      <div class="photo-frame">
+        <img id="mildred-photo-3" alt="Mildred special" style="background: #1a0a18;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%231a0a18\'/%3E%3Ctext x=\'100\' y=\'110\' text-anchor=\'middle\' fill=\'%23ff4d6d\' font-size=\'14\'%3E💖 my heart%3C/text%3E%3C/svg%3E'">
+        <div class="photo-caption">✦ you became my favorite thought ✦</div>
+      </div>
+      <div class="scene-line"></div>
+      <button class="story-btn" onclick="goToCards()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── STAGE 3: CARDS ────────────────────────────── -->
+<div class="section" id="stage-cards">
+  <div class="cards-wrap">
+    <div class="cards-heading">Three things I want you to know</div>
+    <div class="cards-subheading">Tap each card to unlock a truth</div>
+    <div class="cards-row" id="cards-row">
+      <div class="card" id="card-memory" onclick="flipCard('memory')">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="card-icon">🔒</div>
+            <div class="card-label">Memory</div>
+            <div class="lock-icon">● ● ●</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-icon">💭</div>
+            <p>"Every conversation stayed in my mind longer than I expected."</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="card-smile" onclick="flipCard('smile')">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="card-icon">🔒</div>
+            <div class="card-label">Smile</div>
+            <div class="lock-icon">● ● ●</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-icon">🌸</div>
+            <p>"Your smile has a way of making everything lighter."</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="card-feeling" onclick="flipCard('feeling')">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="card-icon">🔒</div>
+            <div class="card-label">Feeling</div>
+            <div class="lock-icon">● ● ●</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-icon">❤️</div>
+            <p>"And I think this feeling deserves honesty."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="cards-unlock-hint" style="font-size:0.78rem;color:rgba(255,214,220,0.35);letter-spacing:0.12em;text-transform:uppercase;">
+      0 / 3 unlocked
+    </div>
+  </div>
+</div>
+
+<!-- ─── FINAL QUESTION ────────────────────────────── -->
+<div class="section" id="stage-question">
+  <div class="question-wrap" id="question-main">
+    <div class="question-eyebrow">// question.exe — running</div>
+    <div class="question-name">Mildred Kyenpia Polycarp</div>
+    <div class="question-text">Will you be<br><span>my girlfriend?</span></div>
+    <div class="question-divider"></div>
+    <div class="answer-btns">
+      <button class="btn-yes" onclick="answerYes()">YES ❤️</button>
+      <button class="btn-no" id="btn-no"
+        onmouseover="dodgeNo(this)"
+        ontouchstart="dodgeNo(this)"
+        onclick="dodgeNo(this)">NO 🙈</button>
+    </div>
+  </div>
+  <div id="yes-response">
+    <div class="yes-emoji">🥹❤️</div>
+    <div class="yes-message">"You just made one developer<br>incredibly happy."</div>
+    <div class="yes-sub">— with love, always —</div>
+  </div>
+</div>
+
+
+<script>
+/* ══════════════════════════════════════════════════
+   FLOATING HEARTS (ambient)
+══════════════════════════════════════════════════ */
+(function() {
+  const c = document.getElementById('hearts-canvas');
+  const ctx = c.getContext('2d');
+  let w, h, hearts = [];
+  function resize() { w = c.width = window.innerWidth; h = c.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  function Heart() {
+    this.reset = function() {
+      this.x = Math.random() * w;
+      this.y = h + 20;
+      this.size = Math.random() * 14 + 6;
+      this.speed = Math.random() * 0.4 + 0.15;
+      this.opacity = Math.random() * 0.18 + 0.04;
+      this.drift = (Math.random() - 0.5) * 0.4;
+    };
+    this.reset();
+    this.y = Math.random() * h;
+  }
+
+  for (let i = 0; i < 18; i++) hearts.push(new Heart());
+
+  function drawHeart(ctx, x, y, size, opacity) {
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = '#ff4d6d';
+    ctx.beginPath();
+    ctx.moveTo(x, y + size * 0.25);
+    ctx.bezierCurveTo(x, y, x - size * 0.5, y, x - size * 0.5, y + size * 0.25);
+    ctx.bezierCurveTo(x - size * 0.5, y + size * 0.6, x, y + size * 0.85, x, y + size);
+    ctx.bezierCurveTo(x, y + size * 0.85, x + size * 0.5, y + size * 0.6, x + size * 0.5, y + size * 0.25);
+    ctx.bezierCurveTo(x + size * 0.5, y, x, y, x, y + size * 0.25);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+    hearts.forEach(h => {
+      h.y -= h.speed; h.x += h.drift;
+      if (h.y < -30) h.reset();
+      drawHeart(ctx, h.x, h.y, h.size, h.opacity);
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ─── IMAGE LOADER: replace with actual image URLs ─── */
+// IMPORTANT: Replace these placeholder URLs with actual images of Mildred
+// The images will automatically show once you replace the URLs below.
+// For now, graceful fallback SVG hearts are shown.
+
+// To add real images, replace the src with your image URLs:
+// Example: document.getElementById('mildred-photo-1').src = 'your-image-1.jpg';
+
+// For demonstration, we'll keep the placeholder system but show an elegant note.
+// You can simply uncomment and replace the lines below with actual image paths.
+
+
+document.getElementById('mildred-photo-1').src = 'mil.jpeg';
+document.getElementById('mildred-photo-2a').src = 'mill.jpeg';
+document.getElementById('mildred-photo-2b').src = 'millll.jpeg';
+document.getElementById('mildred-photo-3').src = 'dred.jpeg';
+
+
+// The current placeholder images show elegant SVG hearts with "Mildred" text.
+// Just replace the src attributes above with your actual image URLs.
+
+/* ══════════════════════════════════════════════════
+   STAGE 1 – TERMINAL TYPER + AUTO ADVANCE
+══════════════════════════════════════════════════ */
+const lines = [
+  { text: '$ boot sequence initiated...', cls: 'dim', delay: 0 },
+  { text: 'Initializing system...', cls: '', delay: 600 },
+  { text: '> Loading memories...', cls: 'dim', delay: 1400 },
+  { text: '> Analyzing conversations with Mildred...', cls: '', delay: 2400 },
+  { text: '', cls: 'dim', delay: 3200 },
+  { text: '  ██████████ 100% complete', cls: 'dim', delay: 3600 },
+  { text: '', cls: '', delay: 4000 },
+  { text: 'Result: Unexpected happiness detected.', cls: 'highlight', delay: 4600 },
+  { text: '> Compiling courage...', cls: 'dim', delay: 5800 },
+  { text: '> Building something honest...', cls: 'dim', delay: 6700 },
+  { text: '', cls: '', delay: 7400 },
+  { text: '⬥ Preparing question.exe', cls: 'warn', delay: 7800 },
+  { text: '⬥ Status: READY', cls: 'warn', delay: 8600 },
+];
+
+const output = document.getElementById('terminal-output');
+
+function typeLinesAndAutoAdvance() {
+  lines.forEach((line, i) => {
+    setTimeout(() => {
+      const cursor = output.querySelector('.cursor');
+      const span = document.createElement('span');
+      span.className = 'line ' + (line.cls || '');
+      span.textContent = line.text;
+      output.insertBefore(span, cursor);
+      output.insertBefore(document.createElement('br'), cursor);
+      output.scrollTop = output.scrollHeight;
+      if (i === lines.length - 1) {
+        setTimeout(() => {
+          setTimeout(() => goToStory(), 5000);
+          document.addEventListener("keydown", goToStory, { once: true });
+          document.addEventListener("click", goToStory, { once: true });
+        }, 800);
+      }
+    }, line.delay);
+  });
+}
+typeLinesAndAutoAdvance();
+
+/* ══════════════════════════════════════════════════
+   STARS FOR SCENE 3
+══════════════════════════════════════════════════ */
+(function() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      --d:${(Math.random()*3+2).toFixed(1)}s;
+      --dl:${(Math.random()*3).toFixed(1)}s;
+    `;
+    container.appendChild(s);
+  }
+})();
+
+/* ══════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════ */
+let currentStage = 0;
+
+function setDot(n) {
+  document.querySelectorAll('.stage-dot').forEach((d,i) => d.classList.toggle('active', i===n));
+}
+
+function showSection(id, stageNum) {
+  document.querySelectorAll('.section').forEach(s => {
+    s.classList.remove('active');
+  });
+  const el = document.getElementById(id);
+  if (id === 'stage-question') {
+    el.style.display = 'flex';
+  }
+  setTimeout(() => {
+    el.classList.add('active');
+  }, 30);
+  currentStage = stageNum;
+  setDot(stageNum);
+}
+
+function goToStory() {
+  showSection('stage-story', 1);
+}
+
+let currentScene = 1;
+function nextScene(from) {
+  const cur = document.getElementById('scene-' + from);
+  const nxt = document.getElementById('scene-' + (from+1));
+  cur.classList.remove('visible');
+  setTimeout(() => { cur.style.display='none'; nxt.classList.add('visible'); }, 500);
+  currentScene = from + 1;
+}
+
+function goToCards() {
+  showSection('stage-cards', 2);
+}
+
+/* ══════════════════════════════════════════════════
+   CARD FLIP
+══════════════════════════════════════════════════ */
+let unlockedCount = 0;
+const unlocked = { memory: false, smile: false, feeling: false };
+
+function flipCard(id) {
+  if (unlocked[id]) return;
+  unlocked[id] = true;
+  document.getElementById('card-' + id).classList.add('flipped');
+  unlockedCount++;
+  document.getElementById('cards-unlock-hint').textContent = unlockedCount + ' / 3 unlocked';
+  if (unlockedCount === 3) {
+    setTimeout(() => {
+      document.getElementById('cards-unlock-hint').textContent = '✦ All truths revealed ✦';
+      document.getElementById('cards-unlock-hint').style.color = 'rgba(255,77,109,0.8)';
+      setTimeout(() => showSection('stage-question', 3), 1200);
+    }, 600);
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   NO BUTTON DODGE
+══════════════════════════════════════════════════ */
+function dodgeNo(btn) {
+  const range = 120;
+  const rx = (Math.random() - 0.5) * 2 * range;
+  const ry = (Math.random() - 0.5) * 2 * range;
+  const rect = btn.getBoundingClientRect();
+  const newX = Math.max(10, Math.min(window.innerWidth - rect.width - 10, rect.left + rx));
+  const newY = Math.max(10, Math.min(window.innerHeight - rect.height - 10, rect.top + ry));
+  btn.style.position = 'fixed';
+  btn.style.left = newX + 'px';
+  btn.style.top = newY + 'px';
+  btn.style.zIndex = '50';
+  btn.style.transition = 'left 0.3s ease, top 0.3s ease';
+}
+
+/* ══════════════════════════════════════════════════
+   YES ANSWER
+══════════════════════════════════════════════════ */
+function answerYes() {
+  document.getElementById('question-main').style.animation = 'fadeIn 0s';
+  document.getElementById('question-main').style.opacity = '0';
+  document.getElementById('question-main').style.transition = 'opacity 0.5s';
+  setTimeout(() => {
+    document.getElementById('question-main').style.display = 'none';
+    document.getElementById('yes-response').classList.add('visible');
+  }, 500);
+  launchConfetti();
+  launchBigHearts();
+}
+
+/* ══════════════════════════════════════════════════
+   CONFETTI
+══════════════════════════════════════════════════ */
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const colors = ['#ff4d6d','#ffd6dc','#ff8fa3','#fff','#ff1744','#ffb3c1','#c9184a'];
+  const pieces = [];
+  for (let i = 0; i < 140; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 4 + 2,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.15,
+      vx: (Math.random() - 0.5) * 3,
+      vy: Math.random() * 3 + 1.5,
+      opacity: 1,
+    });
+  }
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.rotSpeed;
+      if (frame > 120) p.opacity -= 0.007;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (frame < 260) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+function launchBigHearts() {
+  for (let i = 0; i < 12; i++) {
+    setTimeout(() => {
+      const heart = document.createElement('div');
+      heart.textContent = '❤️';
+      heart.style.cssText = `
+        position:fixed; pointer-events:none; z-index:998; font-size:${Math.random()*20+20}px;
+        left:${Math.random()*90+5}vw; bottom:-2rem;
+        animation: riseHeart ${Math.random()*2+2.5}s ease forwards;
+      `;
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 5000);
+    }, i * 180);
+  }
+}
+
+const styleEl = document.createElement('style');
+styleEl.textContent = `@keyframes riseHeart { from{transform:translateY(0) scale(0.6);opacity:1} to{transform:translateY(-110vh) scale(1.2);opacity:0} }`;
+document.head.appendChild(styleEl);
+
+const audio = document.getElementById('bg-audio');
+audio.volume = 0.25;
+
+const startAudio = () => {
+  audio.play().catch(err => console.log('Audio play failed:', err));
+};
+
+// One-time click/tap on body
+document.body.addEventListener('click', startAudio, { once: true });
+document.body.addEventListener('touchstart', startAudio, { once: true });
+
+// Optional: visual cue
+document.body.style.cursor = 'pointer';
+
+</script>
+</body>
+</html>
