@@ -461,7 +461,7 @@
 </style>
 </head>
 <body>
-<audio id="bg-audio" src="/Pufino.mp3" loop></audio>
+<audio id="bg-audio" src="/audio.mp3" loop></audio>
 <canvas id="hearts-canvas"></canvas>
 <canvas id="confetti-canvas"></canvas>
 
@@ -912,19 +912,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('bg-audio');
   audio.volume = 0.25;
 
-  // Attempt to autoplay
-  audio.play().catch(() => {
-    // If blocked, wait for first interaction
-    const resumeAudio = () => {
-      audio.play();
-      window.removeEventListener('click', resumeAudio);
-      window.removeEventListener('keydown', resumeAudio);
-    };
-    window.addEventListener('click', resumeAudio);
-    window.addEventListener('keydown', resumeAudio);
-  });
-});
+  // Create a one-time click/tap on body to start audio
+  const startAudio = () => {
+    audio.play().catch(err => console.log('Autoplay blocked, waiting for interaction'));
+    window.removeEventListener('click', startAudio);
+    window.removeEventListener('touchstart', startAudio);
+  };
 
+  window.addEventListener('click', startAudio);
+  window.addEventListener('touchstart', startAudio);
+});
 </script>
 </body>
 </html>
