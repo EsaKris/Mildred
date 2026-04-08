@@ -908,19 +908,20 @@ const styleEl = document.createElement('style');
 styleEl.textContent = `@keyframes riseHeart { from{transform:translateY(0) scale(0.6);opacity:1} to{transform:translateY(-110vh) scale(1.2);opacity:0} }`;
 document.head.appendChild(styleEl);
 
-const audio = document.getElementById('bg-audio');
+cconst audio = document.getElementById('bg-audio');
 audio.volume = 0.25;
 
-// One-time click/tap anywhere to start audio
 const startAudio = () => {
-  audio.play().catch(err => console.log('Autoplay blocked, waiting for interaction'));
+  audio.play().catch(err => console.log('Audio play failed:', err));
 };
 
-window.addEventListener('click', startAudio, { once: true });
-window.addEventListener('touchstart', startAudio, { once: true });
+// One-time click/tap on body
+document.body.addEventListener('click', startAudio, { once: true });
+document.body.addEventListener('touchstart', startAudio, { once: true });
 
-// Optional: indicate user can click/tap
+// Optional: visual cue
 document.body.style.cursor = 'pointer';
+
 </script>
 </body>
 </html>
