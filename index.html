@@ -908,11 +908,20 @@ const styleEl = document.createElement('style');
 styleEl.textContent = `@keyframes riseHeart { from{transform:translateY(0) scale(0.6);opacity:1} to{transform:translateY(-110vh) scale(1.2);opacity:0} }`;
 document.head.appendChild(styleEl);
 
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('bg-audio');
-  audio.volume = 0.25; // set lower volume
+  audio.volume = 0.25;
+
+  // Attempt to autoplay
   audio.play().catch(() => {
-    console.log('Autoplay blocked. Will start on user interaction.');
+    // If blocked, wait for first interaction
+    const resumeAudio = () => {
+      audio.play();
+      window.removeEventListener('click', resumeAudio);
+      window.removeEventListener('keydown', resumeAudio);
+    };
+    window.addEventListener('click', resumeAudio);
+    window.addEventListener('keydown', resumeAudio);
   });
 });
 </script>
