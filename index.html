@@ -52,7 +52,7 @@
     overflow-x: hidden;
     cursor: pointer; /* shows it’s clickable */
 }
-  }
+  
 
   /* ─── FLOATING HEARTS ─────────────────────────────── */
   #hearts-canvas {
@@ -910,7 +910,7 @@ const styleEl = document.createElement('style');
 styleEl.textContent = `@keyframes riseHeart { from{transform:translateY(0) scale(0.6);opacity:1} to{transform:translateY(-110vh) scale(1.2);opacity:0} }`;
 document.head.appendChild(styleEl);
 
-cconst audio = document.getElementById('bg-audio');
+const audio = document.getElementById('bg-audio');
 audio.volume = 0.25;
 
 const startAudio = () => {
